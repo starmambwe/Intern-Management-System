@@ -105,8 +105,8 @@
                                             </a>
                                         </li>
                                         <!-- Manage Users -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('views/admin/manageUsers.html', 'mainContainer')">
+                                        <li> 
+                                            <a onclick="loadPageIntoElement('admin.manageUsers', 'mainContainer')">
                                                 <span class="sub-item">Manage Users</span>
                                             </a>
                                         </li>
@@ -949,10 +949,13 @@
             fillColor: "rgba(255, 165, 52, .14)",
         });
 
-        function loadPageIntoElement(url, elementId) {
+        function loadPageIntoElement(viewUrl, elementId) {
             $.ajax({
-                url: url,
+                url: "{{route('loadPageIntoElement')}}", // Wrap the route in quotes to pass it as a string
                 method: 'GET',
+                data: {
+                    viewUrl: viewUrl
+                    },
                 success: function(response) {
                     $('#' + elementId).html(response);
                 },

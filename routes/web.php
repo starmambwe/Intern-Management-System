@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RouteController; // Import RouteController
+
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -20,3 +22,4 @@ Route::get('/login', function () {
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+Route::get('/loadPageIntoElement', [RouteController::class, 'loadPageIntoElement'])->name('loadPageIntoElement');

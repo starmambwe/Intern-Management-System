@@ -94,13 +94,13 @@
                                     <ul class="nav nav-collapse">
                                         <!-- Create Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/admin/createProjects.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('admin.createProjects', 'mainContainer')">
                                                 <span class="sub-item">Create Projects</span>
                                             </a>
                                         </li>
                                         <!-- Assign Supervisors -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/admin/assignSupervisors.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('admin.assignSupervisors', 'mainContainer')">
                                                 <span class="sub-item">Assign Supervisors</span>
                                             </a>
                                         </li>
@@ -112,7 +112,7 @@
                                         </li>
                                         <!-- View Reports -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/admin/viewReports.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('admin.viewReports', 'mainContainer')">
                                                 <span class="sub-item">View Reports</span>
                                             </a>
                                         </li>
@@ -131,67 +131,67 @@
                                     <ul class="nav nav-collapse">
                                         <!-- Manage Assigned Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/assignedProjects.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.assignedProjects', 'mainContainer')">
                                                 <span class="sub-item">Manage Assigned Projects</span>
                                             </a>
                                         </li>
                                         <!-- Create Tasks Under Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/createTasks.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.createTasks', 'mainContainer')">
                                                 <span class="sub-item">Create Tasks Under Projects</span>
                                             </a>
                                         </li>
                                         <!-- Assign Tasks to Interns -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/assignTasks.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.assignTasks', 'mainContainer')">
                                                 <span class="sub-item">Assign Tasks to Interns</span>
                                             </a>
                                         </li>
                                         <!-- Track Intern Progress -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/internProgress.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.internProgress', 'mainContainer')">
                                                 <span class="sub-item">Track Intern Progress</span>
                                             </a>
                                         </li>
                                         <!-- Approve/Reject Intern Reports -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/approveRejectReports.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.approveRejectReports', 'mainContainer')">
                                                 <span class="sub-item">Approve/Reject Intern Reports</span>
                                             </a>
                                         </li>
                                         <!-- Submit Feedback for Tasks/Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/feedback.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.feedback', 'mainContainer')">
                                                 <span class="sub-item">Submit Feedback for Tasks/Projects</span>
                                             </a>
                                         </li>
                                         <!-- View Attendance of Interns -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/attendance.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.attendance', 'mainContainer')">
                                                 <span class="sub-item">View Attendance of Interns</span>
                                             </a>
                                         </li>
                                         <!-- Monitor Project Progress -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/projectProgress.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.projectProgress', 'mainContainer')">
                                                 <span class="sub-item">Monitor Project Progress</span>
                                             </a>
                                         </li>
                                         <!-- Receive Notifications (Task Submissions, Deadlines) -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/notifications.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.notifications', 'mainContainer')">
                                                 <span class="sub-item">Receive Notifications</span>
                                             </a>
                                         </li>
                                         <!-- Review Time Tracked on Tasks -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/timeTrack.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.timeTrack', 'mainContainer')">
                                                 <span class="sub-item">Review Time Tracked on Tasks</span>
                                             </a>
                                         </li>
                                         <!-- Participate in Comment Threads for Tasks -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/supervisor/comments.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('supervisor.comments', 'mainContainer')">
                                                 <span class="sub-item">Participate in Comment Threads</span>
                                             </a>
                                         </li>
@@ -210,49 +210,49 @@
                                     <ul class="nav nav-collapse">
                                         <!-- View Assigned Projects and Tasks -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/projectsAndTasks.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.projectsAndTasks', 'mainContainer')">
                                                 <span class="sub-item">Projects and Tasks</span>
                                             </a>
                                         </li>
                                         <!-- Work on Tasks and Submit Reports -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/reports.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.reports', 'mainContainer')">
                                                 <span class="sub-item">Task(s) Report(s) Submission</span>
                                             </a>
                                         </li>
                                         <!-- Mark Daily Attendance -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/attendance.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.attendance', 'mainContainer')">
                                                 <span class="sub-item">Mark Daily Attendance</span>
                                             </a>
                                         </li>
                                         <!-- Request Help Within a Project -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/help.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.help', 'mainContainer')">
                                                 <span class="sub-item">Request Help Within a Project</span>
                                             </a>
                                         </li>
                                         <!-- Track Personal Progress on Tasks and Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/progress.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.progress', 'mainContainer')">
                                                 <span class="sub-item">Personal Progress</span>
                                             </a>
                                         </li>
                                         <!-- Receive Notifications (New Tasks, Feedback, Deadlines) -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/notifications.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.notifications', 'mainContainer')">
                                                 <span class="sub-item">Notifications</span>
                                             </a>
                                         </li>
                                         <!-- Log Time Spent on Tasks -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/timeLogs.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.timeLogs', 'mainContainer')">
                                                 <span class="sub-item">Time Spent on Tasks</span>
                                             </a>
                                         </li>
                                         <!-- Participate in Comment Threads for Tasks -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('views/intern/comments.html', 'mainContainer')">
+                                            <a onclick="loadPageIntoElement('intern.comments', 'mainContainer')">
                                                 <span class="sub-item">Participate in Comment Threads</span>
                                             </a>
                                         </li>

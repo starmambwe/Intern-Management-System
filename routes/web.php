@@ -33,3 +33,11 @@ Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 Route::post('/users', [UserController::class, 'store'])->name('saveUser');
 
 Route::get('/users', [UserController::class, 'store'])->name('saveUser');
+
+// Get user's current roles
+Route::get('/users/{user}/roles', [UserController::class, 'getRoles'])
+    ->name('users.roles.get');
+
+// Update user's roles
+Route::put('/users/{user}/roles', [UserController::class, 'updateRoles'])
+    ->name('users.roles.update');

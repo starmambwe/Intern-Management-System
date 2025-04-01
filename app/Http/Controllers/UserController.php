@@ -43,4 +43,27 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+
+    public function getRoles(User $user)
+    {
+        return response()->json([
+            'roles' => $user->roles->pluck('id')->toArray()
+        ]);
+    }
+
+    public function updateRoles(Request $request, User $user)
+    {
+        $request->validate([
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id'
+        ]);
+
+        $user->roles()->sync($request->roles);
+
+        return response()->json([
+            'message' => 'Roles updated successfully',
+            'user' => $user->load('roles') // Reload with fresh roles
+        ]);
+    }
 }

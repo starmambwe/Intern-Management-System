@@ -1,3 +1,58 @@
+<style>
+  .badge {
+    margin-right: 3px;
+  }
+
+  .text-muted {
+    font-style: italic;
+    color: #6c757d;
+  }
+
+  #rolesCheckboxGroup {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+  }
+
+  .form-check {
+    margin-bottom: 8px;
+    padding: 5px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .form-check:last-child {
+    border-bottom: none;
+  }
+
+
+  .updated-highlight {
+    animation: highlight-fade 2s;
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+
+  @keyframes highlight-fade {
+    0% {
+      background-color: rgba(40, 167, 69, 0.3);
+    }
+
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .user-roles {
+    min-width: 150px;
+  }
+
+  .badge {
+    margin-bottom: 3px;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>
+
 <div class="container mt-4">
   <h2>Manage Users & Roles</h2>
 
@@ -94,14 +149,81 @@
         <th>#</th>
         <th>Name</th>
         <th>Email</th>
-        <th>Role</th>
+        <th>Roles</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Users will be dynamically loaded here -->
+      @foreach($users as $user)
+      <tr>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $user->name }}</td>
+        <td>{{ $user->email }}</td>
+        <td class="user-roles">
+          @foreach($user->roles as $role)
+          <span class="badge bg-primary">{{ $role->name }}</span>
+          @if(!$loop->last) , @endif
+          @endforeach
+          @if($user->roles->isEmpty())
+          <span class="text-muted">No roles assigned</span>
+          @endif
+        </td>
+        <td>
+          <button class="btn btn-sm btn-warning edit-user" data-id="{{ $user->id }}">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+
+          <button class="btn btn-sm btn-primary manage-roles"
+            data-user-id="{{ $user->id }}"
+            data-user-name="{{ $user->name }}">
+            <i class="fas fa-user-cog"></i> Manage Roles
+          </button>
+
+        </td>
+      </tr>
+      @endforeach
     </tbody>
   </table>
+</div>
+
+
+
+<div class="modal fade" id="rolesModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Roles for: <span id="userName"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="rolesForm">
+          @csrf
+          <input type="hidden" id="modalUserId">
+          <div class="mb-3">
+            <label class="form-label">Available Roles</label>
+            <div id="rolesCheckboxGroup">
+              @foreach($roles as $role)
+              <div class="form-check">
+                <input class="form-check-input role-checkbox"
+                  type="checkbox"
+                  name="roles[]"
+                  value="{{ $role->id }}"
+                  id="role-{{ $role->id }}">
+                <label class="form-check-label" for="role-{{ $role->id }}">
+                  {{ $role->name }}
+                </label>
+              </div>
+              @endforeach
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveRolesBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -109,6 +231,85 @@
 <script>
   $(document).ready(function() {
 
+    // Show modal with user's current roles
+    $(document).on('click', '.manage-roles', function() {
+      const userId = $(this).data('user-id');
+      const userName = $(this).data('user-name');
+
+      $('#modalUserId').val(userId);
+      $('#userName').text(userName);
+
+      // Reset all checkboxes
+      $('.role-checkbox').prop('checked', false);
+
+      // Fetch user's current roles
+      $.get(`/users/${userId}/roles`, function(response) {
+        response.roles.forEach(roleId => {
+          $(`#role-${roleId}`).prop('checked', true);
+        });
+
+        $('#rolesModal').modal('show');
+      });
+    });
+
+    // Save role changes
+    $('#saveRolesBtn').click(function() {
+      const userId = $('#modalUserId').val();
+      const roles = $('input[name="roles[]"]:checked').map(function() {
+        return this.value;
+      }).get();
+
+
+      $('#saveRolesBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+
+      $.ajax({
+        url: `/users/${userId}/roles`,
+        method: 'PUT',
+        data: {
+          roles: roles,
+          _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+          $('#saveRolesBtn').prop('disabled', false).html('Save Changes');
+          $('#rolesModal').modal('hide');
+
+          // Update the UI directly
+          updateUserRolesUI(userId, response.user.roles);
+
+          toastr.success(`${userName}'s roles updated successfully`);
+        },
+        error: function(xhr) {
+          toastr.error(xhr.responseJSON.message || 'Error saving roles');
+        }
+      });
+    });
+
+    function updateUserRolesUI(userId, roles) {
+      // Find the user's row in the table
+      const userRow = $(`button.manage-roles[data-user-id="${userId}"]`).closest('tr');
+
+      // Clear existing roles
+      userRow.find('.user-roles').empty();
+
+      // Add new roles
+      if (roles.length > 0) {
+        roles.forEach((role, index) => {
+          userRow.find('.user-roles').append(`
+                <span class="badge bg-primary me-1">${role.name}</span>
+            `);
+        });
+      } else {
+        userRow.find('.user-roles').html(`
+            <span class="text-muted">No roles assigned</span>
+        `);
+      }
+
+      // Visual feedback
+      userRow.addClass('updated-highlight');
+      setTimeout(() => {
+        userRow.removeClass('updated-highlight');
+      }, 2000);
+    }
 
     $('#userForm').on('submit', function(e) {
       e.preventDefault();

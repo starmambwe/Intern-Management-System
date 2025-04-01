@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class RouteController extends Controller
@@ -14,8 +15,9 @@ class RouteController extends Controller
 
         switch ($page) {
             case 'admin.manageUsers':
-                $roles = Role::all(); // Better to use all() instead of get() for simple queries
-                return view($page, compact('roles')); // compact() is cleaner for simple arrays
+                $users = User::with('roles')->get(); // Eager load roles
+                $roles = Role::all();
+                return view($page, compact('users', 'roles'));
 
             default:
                 return view($page);

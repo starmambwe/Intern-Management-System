@@ -952,7 +952,12 @@
         });
 
         function loadPageIntoElement(viewUrl, elementId) {
-            $('#' + elementId).html('<div class="alert alert-info">LOADING..................</div>');
+            $('#' + elementId).html(`<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="text-center">
+            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+            <div class="h5">Loading...</div>
+        </div>
+    </div>`);
             $.ajax({
                 url: "{{route('loadPageIntoElement')}}", // Wrap the route in quotes to pass it as a string
                 method: 'GET',

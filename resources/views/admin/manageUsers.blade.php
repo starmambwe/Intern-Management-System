@@ -15,26 +15,51 @@
   <div id="usersSection" class="mt-3">
     <h3>Manage Users</h3>
     <form id="userForm">
+      @csrf
       <input type="hidden" id="userId">
       <div class="mb-3">
         <label for="userName" class="form-label">Name</label>
-        <input type="text" class="form-control" id="userName" placeholder="Enter full name" required>
+        <input type="text" class="form-control" id="userName" name="name" placeholder="Enter full name" required>
       </div>
       <div class="mb-3">
         <label for="userEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="userEmail" placeholder="Enter email" required>
+        <input type="email" class="form-control" id="userEmail" name="email" placeholder="Enter email" required>
       </div>
       <div class="mb-3">
         <label for="userRole" class="form-label">Role</label>
-        <select class="form-select" id="userRole" required>
-          <option value="">Select role</option>
-          <option value="Admin">Admin</option>
-          <option value="Supervisor">Supervisor</option>
-          <option value="Intern">Intern</option>
-        </select>
+
+
+        <ul>
+          @foreach($roles as $role)
+          <li>
+            <label class="checkbox">
+              <input type="checkbox" name="role[]" value="{{ $role->id }}">
+              {{ $role->name }}
+            </label>
+          </li>
+          @endforeach
+
+          @if(count($roles) == 0)
+          <li>
+            <p>No roles available</p>
+          </li>
+          @endif
+        </ul>
       </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password_confirmation" class="form-label">Re-enter Password</label>
+        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Re-enter your password" required>
+      </div>
+
+
       <button type="submit" class="btn btn-primary" id="saveUserBtn">Save User</button>
-      <button type="reset" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+
     </form>
   </div>
 
@@ -51,70 +76,12 @@
 
     <!-- Roles List -->
     <h4>Existing Roles</h4>
+    <p id="msg"></p>
     <ul id="rolesList" class="list-group">
       <!-- Roles will be dynamically added here -->
     </ul>
   </div>
 
-
-<script>
-  $(document).ready(function() {
-    // Tab Switching
-    $("#usersTab").click(function() {
-      $("#usersSection").show();
-      $("#rolesSection").hide();
-      $("#usersTab").addClass("active");
-      $("#rolesTab").removeClass("active");
-    });
-
-    $("#rolesTab").click(function() {
-      $("#rolesSection").show();
-      $("#usersSection").hide();
-      $("#rolesTab").addClass("active");
-      $("#usersTab").removeClass("active");
-    });
-
-    // Mock roles data
-    let roles = ["Admin", "Supervisor", "Intern"];
-
-    // Load roles into the list
-    function loadRoles() {
-      $("#rolesList").html("");
-      roles.forEach((role, index) => {
-        $("#rolesList").append(`
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>${role}</span>
-            <button class="btn btn-sm btn-warning renameRoleBtn" data-index="${index}">Rename</button>
-          </li>
-        `);
-      });
-    }
-
-    loadRoles(); // Initial load
-
-    // Add Role
-    $("#addRoleBtn").click(function() {
-      const newRole = $("#roleName").val().trim();
-      if (newRole) {
-        roles.push(newRole);
-        loadRoles();
-        $("#roleName").val(""); // Clear input
-      } else {
-        alert("Role name cannot be empty.");
-      }
-    });
-
-    // Rename Role
-    $(document).on("click", ".renameRoleBtn", function() {
-      const index = $(this).data("index");
-      const newName = prompt("Enter new role name:", roles[index]);
-      if (newName) {
-        roles[index] = newName;
-        loadRoles();
-      }
-    });
-  });
-</script>
 
 
   <hr class="my-5">
@@ -137,149 +104,117 @@
   </table>
 </div>
 
+
+
 <script>
   $(document).ready(function() {
 
-    let userCount = 0;
 
-    function resetForm() {
-      $('#userId').val('');
-      $('#userForm')[0].reset();
-      $('#saveUserBtn').text('Save User');
-      $('#cancelEditBtn').hide();
-    }
-
-    function loadUsers() {
-      $('#usersTable tbody').empty();
-      userCount = 0;
-
-      // Active dummy data
-      const dummyUsers = [
-        { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
-        { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'Supervisor' },
-        { id: 3, name: 'Charlie Davis', email: 'charlie@example.com', role: 'Intern' }
-      ];
-
-      $.each(dummyUsers, function(_, user) {
-        userCount++;
-        $('#usersTable tbody').append(`
-          <tr data-id="${user.id}">
-            <td>${userCount}</td>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.role}</td>
-            <td>
-              <button class="btn btn-sm btn-warning editBtn">Edit</button>
-              <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
-            </td>
-          </tr>
-        `);
-      });
-
-      /*
-      // Uncomment this block to switch back to real AJAX data
-      $.ajax({
-        url: 'ajax.manageUsers.php',
-        method: 'GET',
-        data: { action: 'read' },
-        dataType: 'json',
-        success: function(users) {
-          $.each(users, function(_, user) {
-            userCount++;
-            $('#usersTable tbody').append(`
-              <tr data-id="${user.id}">
-                <td>${userCount}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>
-                  <button class="btn btn-sm btn-warning editBtn">Edit</button>
-                  <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
-                </td>
-              </tr>
-            `);
-          });
-        }
-      });
-      */
-    }
-
-    loadUsers();
-
-    $('#userForm').submit(function(e) {
+    $('#userForm').on('submit', function(e) {
       e.preventDefault();
 
-      const id = $('#userId').val();
-      const userData = {
-        id: id,
-        name: $('#userName').val(),
-        email: $('#userEmail').val(),
-        role: $('#userRole').val()
-      };
+      $.ajax({
+        type: 'POST',
+        url: "{{ route('saveUser') }}",
+        data: $(this).serialize(),
+        dataType: 'JSON',
+        success: function(response) {
+          alert('User created successfully');
+          // Reset form or redirect as needed
+          $('#userForm')[0].reset();
+        },
+        error: function(xhr) {
+          if (xhr.status === 422) {
+            const errors = xhr.responseJSON.error;
+            $.each(errors, function(key, value) {
+              alert(value[0]);
+              console.log(value[0]);
+            });
+          } else {
+            console.log('An error occurred. Please try again.');
+          }
+        }
+      });
+    });
 
-      const ajaxUrl = id ? 'ajax.manageUsers.php?action=update' : 'ajax.manageUsers.php?action=create';
+
+    // Tab Switching
+    $("#usersTab").click(function() {
+      $("#usersSection").show();
+      $("#rolesSection").hide();
+      $("#usersTab").addClass("active");
+      $("#rolesTab").removeClass("active");
+    });
+
+    $("#rolesTab").click(function() {
+      $("#rolesSection").show();
+      $("#usersSection").hide();
+      $("#rolesTab").addClass("active");
+      $("#usersTab").removeClass("active");
+    });
+
+
+    // Load existing roles on page load
+    loadRoles();
+
+    // Add new role
+    $('#addRoleBtn').click(function() {
+      const roleName = $('#roleName').val().trim();
+
+      if (!roleName) {
+        alert('Please enter a role name');
+        return;
+      }
 
       $.ajax({
-        url: ajaxUrl,
+        url: "{{ route('roles.store') }}",
         method: 'POST',
-        data: userData,
-        dataType: 'json',
+        data: {
+          name: roleName,
+          _token: '{{ csrf_token() }}'
+        },
         success: function(response) {
           if (response.success) {
-            loadUsers();
-            resetForm();
+            $('#roleName').val(''); // Clear input
+            loadRoles(); // Refresh list
+            $('#msg').html(response.message).addClass('animated slideInLeft alert alert-success');
+
+            setTimeout(function() {
+              $('#msg').removeClass('slideInLeft').addClass('animated slideOutRight');
+            }, 5000);
+          }
+        },
+
+        error: function(xhr) {
+          const errors = xhr.responseJSON.errors;
+          if (errors && errors.name) {
+            alert(errors.name[0]);
           } else {
-            alert('Error: ' + response.message);
+            alert('An error occurred. Please try again.');
           }
         }
       });
     });
 
-    $('#usersTable').on('click', '.editBtn', function() {
-      const row = $(this).closest('tr');
-      const id = row.data('id');
+    // Function to load all roles
+    function loadRoles() {
+      $.get("{{ route('roles.index') }}", function(response) {
+        const rolesList = $('#rolesList');
+        rolesList.empty(); // Clear existing items
 
-      $.ajax({
-        url: 'ajax.manageUsers.php',
-        method: 'GET',
-        data: { action: 'getUser', id: id },
-        dataType: 'json',
-        success: function(user) {
-          $('#userId').val(user.id);
-          $('#userName').val(user.name);
-          $('#userEmail').val(user.email);
-          $('#userRole').val(user.role);
-          $('#saveUserBtn').text('Update User');
-          $('#cancelEditBtn').show();
+        if (response.length > 0) {
+          response.forEach(function(role) {
+            rolesList.append(`
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${role.name}
+                            <span class="badge bg-primary rounded-pill">ID: ${role.id}</span>
+                        </li>
+                    `);
+          });
+        } else {
+          rolesList.append('<li class="list-group-item">No roles found</li>');
         }
       });
-    });
-
-    $('#usersTable').on('click', '.deleteBtn', function() {
-      const row = $(this).closest('tr');
-      const id = row.data('id');
-
-      if (confirm('Are you sure you want to delete this user?')) {
-        $.ajax({
-          url: 'ajax.manageUsers.php?action=delete',
-          method: 'POST',
-          data: { id: id },
-          dataType: 'json',
-          success: function(response) {
-            if (response.success) {
-              row.remove();
-              loadUsers();
-            } else {
-              alert('Error: ' + response.message);
-            }
-          }
-        });
-      }
-    });
-
-    $('#cancelEditBtn').click(function() {
-      resetForm();
-    });
-
+    }
   });
 </script>

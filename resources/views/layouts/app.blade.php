@@ -7,6 +7,8 @@
     <meta
         content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
         name="viewport" />
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link
         rel="icon"
         href="assets/img/kaiadmin/favicon.ico"
@@ -105,7 +107,7 @@
                                             </a>
                                         </li>
                                         <!-- Manage Users -->
-                                        <li> 
+                                        <li>
                                             <a onclick="loadPageIntoElement('admin.manageUsers', 'mainContainer')">
                                                 <span class="sub-item">Manage Users</span>
                                             </a>
@@ -950,12 +952,13 @@
         });
 
         function loadPageIntoElement(viewUrl, elementId) {
+            $('#' + elementId).html('<div class="alert alert-info">LOADING..................</div>');
             $.ajax({
                 url: "{{route('loadPageIntoElement')}}", // Wrap the route in quotes to pass it as a string
                 method: 'GET',
                 data: {
                     viewUrl: viewUrl
-                    },
+                },
                 success: function(response) {
                     $('#' + elementId).html(response);
                 },

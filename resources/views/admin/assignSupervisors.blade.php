@@ -1,250 +1,370 @@
 <div class="container mt-5">
-  <h2>Assign Supervisors to Projects</h2>
+  <h2>Project Assignments</h2>
 
-  <!-- Assignment Form -->
-  <form id="assignmentForm">
-    <input type="hidden" id="assignmentId">
+  <!-- Tab Navigation -->
+  <ul class="nav nav-tabs mb-4" id="assignmentTabs">
+      <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#supervisors-tab">Supervisors</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#interns-tab">Interns</a>
+      </li>
+  </ul>
 
-    <div class="mb-3">
-      <label for="projectName" class="form-label">Project</label>
-      <select class="form-select" id="projectName" required>
-        <option value="">Select a project</option>
-        <!-- Dynamically load projects via AJAX -->
-      </select>
-    </div>
+  <!-- Tab Content -->
+  <div class="tab-content">
+      <!-- Supervisors Tab -->
+      <div class="tab-pane fade show active" id="supervisors-tab">
+          <!-- Assignment Form -->
+          <form id="supervisorAssignmentForm" class="mb-4">
+              @csrf
+              <input type="hidden" name="role" value="supervisor">
+              <div class="row g-3 align-items-end">
+                  <div class="col-md-5">
+                      <label for="supervisorProject" class="form-label">Project</label>
+                      <select class="form-select" id="supervisorProject" name="project_id" required>
+                          <option value="">Select project</option>
+                          <!-- Dynamically populated via AJAX -->
+                      </select>
+                  </div>
+                  <div class="col-md-5">
+                      <label for="supervisorUser" class="form-label">Supervisor</label>
+                      <select class="form-select" id="supervisorUser" name="user_id" required>
+                          <option value="">Select supervisor</option>
+                          <!-- Dynamically populated via AJAX -->
+                      </select>
+                  </div>
+                  <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary w-100">Assign</button>
+                  </div>
+              </div>
+          </form>
 
-    <div class="mb-3">
-      <label for="supervisorName" class="form-label">Supervisor</label>
-      <select class="form-select" id="supervisorName" required>
-        <option value="">Select a supervisor</option>
-        <!-- Dynamically load supervisors via AJAX -->
-      </select>
-    </div>
+          <!-- Supervisors Table -->
+          <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                  <thead class="table-light">
+                      <tr>
+                          <th width="5%">#</th>
+                          <th width="45%">Project</th>
+                          <th width="35%">Supervisor</th>
+                          <th width="15%">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody id="supervisorsTableBody">
+                      <!-- Dynamically populated via AJAX -->
+                  </tbody>
+              </table>
+          </div>
+      </div>
 
-    <button type="submit" class="btn btn-primary" id="saveAssignmentBtn">Save Assignment</button>
-    <button type="reset" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
-  </form>
+      <!-- Interns Tab -->
+      <div class="tab-pane fade" id="interns-tab">
+          <!-- Assignment Form -->
+          <form id="internAssignmentForm" class="mb-4">
+              @csrf
+              <input type="hidden" name="role" value="intern">
+              <div class="row g-3 align-items-end">
+                  <div class="col-md-5">
+                      <label for="internProject" class="form-label">Project</label>
+                      <select class="form-select" id="internProject" name="project_id" required>
+                          <option value="">Select project</option>
+                          <!-- Dynamically populated via AJAX -->
+                      </select>
+                  </div>
+                  <div class="col-md-5">
+                      <label for="internUser" class="form-label">Intern</label>
+                      <select class="form-select" id="internUser" name="user_id" required>
+                          <option value="">Select intern</option>
+                          <!-- Dynamically populated via AJAX -->
+                      </select>
+                  </div>
+                  <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary w-100">Assign</button>
+                  </div>
+              </div>
+          </form>
 
-  <hr class="my-5">
-
-  <!-- Assignments Table -->
-  <h4>Existing Assignments</h4>
-  <table class="table table-bordered" id="assignmentsTable">
-    <thead class="table-light">
-      <tr>
-        <th>#</th>
-        <th>Project</th>
-        <th>Supervisor</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Assignments will be dynamically inserted here -->
-    </tbody>
-  </table>
+          <!-- Interns Table -->
+          <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                  <thead class="table-light">
+                      <tr>
+                          <th width="5%">#</th>
+                          <th width="45%">Project</th>
+                          <th width="35%">Intern</th>
+                          <th width="15%">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody id="internsTableBody">
+                      <!-- Dynamically populated via AJAX -->
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
 </div>
 
+
 <script>
-  $(document).ready(function() {
+  // This script handles tab switching, AJAX setup, dynamic dropdown loading, assignment CRUD, and UI feedback via Bootstrap Alerts
+    $(document).ready(function() {
+    // --- CSRF Token Setup for Laravel AJAX requests ---
+    $.ajaxSetup({
+        headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 
-    let assignmentCount = 0;
+    // --- Initialize the currently active tab ---
+    let currentTab = window.location.hash || '#supervisors-tab';
+    $(`a[href="${currentTab}"]`).tab('show');
 
-    function resetForm() {
-      $('#assignmentId').val('');
-      $('#assignmentForm')[0].reset();
-      $('#saveAssignmentBtn').text('Save Assignment');
-      $('#cancelEditBtn').hide();
-    }
-
-    function appendAssignmentToTable(assignment) {
-      assignmentCount++;
-      $('#assignmentsTable tbody').append(`
-        <tr data-id="${assignment.id}">
-          <td>${assignmentCount}</td>
-          <td>${assignment.project_name}</td>
-          <td>${assignment.supervisor_name}</td>
-          <td>
-            <button class="btn btn-sm btn-warning editBtn">Edit</button>
-            <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
-          </td>
-        </tr>
-      `);
-    }
-
-    function loadProjects() {
-      const dummyProjects = [
-        { id: 1, name: 'Project Alpha' },
-        { id: 2, name: 'Project Beta' },
-        { id: 3, name: 'Project Gamma' }
-      ];
-
-      $('#projectName').empty().append('<option value="">Select a project</option>');
-
-      // Comment/uncomment as needed
-      // $.ajax({
-      //   url: 'ajax.assignSupervisors.php',
-      //   method: 'GET',
-      //   data: { type: 'projects' },
-      //   dataType: 'json',
-      //   success: function(projects) {
-      //     $.each(projects, function(_, project) {
-      //       $('#projectName').append(`<option value="${project.id}">${project.name}</option>`);
-      //     });
-      //   }
-      // });
-
-      $.each(dummyProjects, function(_, project) {
-        $('#projectName').append(`<option value="${project.id}">${project.name}</option>`);
-      });
-    }
-
-    function loadSupervisors() {
-      const dummySupervisors = [
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Michael Johnson' }
-      ];
-
-      $('#supervisorName').empty().append('<option value="">Select a supervisor</option>');
-
-      // Comment/uncomment as needed
-      // $.ajax({
-      //   url: 'ajax.assignSupervisors.php',
-      //   method: 'GET',
-      //   data: { type: 'supervisors' },
-      //   dataType: 'json',
-      //   success: function(supervisors) {
-      //     $.each(supervisors, function(_, supervisor) {
-      //       $('#supervisorName').append(`<option value="${supervisor.id}">${supervisor.name}</option>`);
-      //     });
-      //   }
-      // });
-
-      $.each(dummySupervisors, function(_, supervisor) {
-        $('#supervisorName').append(`<option value="${supervisor.id}">${supervisor.name}</option>`);
-      });
-    }
-
-    function loadAssignments() {
-      const dummyAssignments = [
-        { id: 1, project_name: 'Project Alpha', supervisor_name: 'John Doe', project_id: 1, supervisor_id: 1 },
-        { id: 2, project_name: 'Project Beta', supervisor_name: 'Jane Smith', project_id: 2, supervisor_id: 2 },
-        { id: 3, project_name: 'Project Gamma', supervisor_name: 'Michael Johnson', project_id: 3, supervisor_id: 3 }
-      ];
-
-      $('#assignmentsTable tbody').empty();
-      assignmentCount = 0;
-
-      // Comment/uncomment as needed
-      // $.ajax({
-      //   url: 'ajax.assignSupervisors.php',
-      //   method: 'GET',
-      //   data: { type: 'assignments' },
-      //   dataType: 'json',
-      //   success: function(assignments) {
-      //     $.each(assignments, function(_, assignment) {
-      //       appendAssignmentToTable(assignment);
-      //     });
-      //   }
-      // });
-
-      $.each(dummyAssignments, function(_, assignment) {
-        appendAssignmentToTable(assignment);
-      });
-    }
-
-    loadProjects();
-    loadSupervisors();
+    // --- Load data on initial page load ---
+    loadDropdowns();
     loadAssignments();
 
-    $('#assignmentForm').submit(function(e) {
-      e.preventDefault();
-
-      const id = $('#assignmentId').val();
-      const assignmentData = {
-        id: id,
-        project_id: $('#projectName').val(),
-        supervisor_id: $('#supervisorName').val()
-      };
-
-      const ajaxUrl = id ? 'ajax.assignSupervisors.php?action=update' : 'ajax.assignSupervisors.php?action=create';
-
-      $.ajax({
-        url: ajaxUrl,
-        method: 'POST',
-        data: assignmentData,
-        dataType: 'json',
-        success: function(response) {
-          if (response.success) {
-            loadAssignments();
-            resetForm();
-          } else {
-            alert('Error: ' + response.message);
-          }
-        }
-      });
+    // --- Update tab in URL and reload assignments when user switches tabs ---
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+        window.location.hash = e.target.hash;
+        loadAssignments();
     });
 
-    $('#assignmentsTable').on('click', '.editBtn', function() {
-      const row = $(this).closest('tr');
-      const id = row.data('id');
+    // --- Function to display Bootstrap alerts instead of toastr ---
+    function showAlert(message, type = 'success') {
+        const alertBox = $('#alertBox');
+        alertBox
+        .removeClass('d-none alert-success alert-danger alert-warning alert-info')
+        .addClass(`alert alert-${type}`)
+        .html(message);
+        setTimeout(() => alertBox.addClass('d-none'), 5000); // auto-hide after 5 seconds
+    }
 
-      // For dummy data testing, manually fill values (since no AJAX fetch)
-      const assignment = {
-        id: id,
-        project_id: row.find('td:nth-child(2)').text() === 'Project Alpha' ? 1 :
-                    row.find('td:nth-child(2)').text() === 'Project Beta' ? 2 : 3,
-        supervisor_id: row.find('td:nth-child(3)').text() === 'John Doe' ? 1 :
-                       row.find('td:nth-child(3)').text() === 'Jane Smith' ? 2 : 3
-      };
-
-      // Comment/uncomment as needed
-      // $.ajax({
-      //   url: 'ajax.assignSupervisors.php',
-      //   method: 'GET',
-      //   data: { type: 'assignment', id: id },
-      //   dataType: 'json',
-      //   success: function(assignment) {
-      //     $('#assignmentId').val(assignment.id);
-      //     $('#projectName').val(assignment.project_id);
-      //     $('#supervisorName').val(assignment.supervisor_id);
-      //     $('#saveAssignmentBtn').text('Update Assignment');
-      //     $('#cancelEditBtn').show();
-      //   }
-      // });
-
-      $('#assignmentId').val(assignment.id);
-      $('#projectName').val(assignment.project_id);
-      $('#supervisorName').val(assignment.supervisor_id);
-      $('#saveAssignmentBtn').text('Update Assignment');
-      $('#cancelEditBtn').show();
-    });
-
-    $('#assignmentsTable').on('click', '.deleteBtn', function() {
-      const row = $(this).closest('tr');
-      const id = row.data('id');
-
-      if (confirm('Are you sure you want to delete this assignment?')) {
+    // --- Function to load dropdown values for project, supervisor, intern ---
+    function loadDropdowns() {
+        // Load Projects
         $.ajax({
-          url: 'ajax.assignSupervisors.php?action=delete',
-          method: 'POST',
-          data: { id: id },
-          dataType: 'json',
-          success: function(response) {
-            if (response.success) {
-              row.remove();
-              loadAssignments();
-            } else {
-              alert('Error: ' + response.message);
-            }
-          }
+        url: "{{ route('assignments.projects') }}",
+        method: 'GET',
+        beforeSend: function() {
+            $('#supervisorProject, #internProject').html('<option value="">Loading projects...</option>');
+        },
+        success: function(projects) {
+            let options = '<option value="">Select project</option>';
+            projects.forEach(project => {
+            options += `<option value="${project.id}">${project.name}</option>`;
+            });
+            $('#supervisorProject, #internProject').html(options);
+        },
+        error: function() {
+            $('#supervisorProject, #internProject').html('<option value="">Error loading projects</option>');
+            showAlert('Failed to load projects', 'danger');
+        }
         });
-      }
+
+        // Load Supervisors
+        $.ajax({
+        url: "{{ route('assignments.supervisors') }}",
+        method: 'GET',
+        beforeSend: function() {
+            $('#supervisorUser').html('<option value="">Loading supervisors...</option>');
+        },
+        success: function(supervisors) {
+            let options = '<option value="">Select supervisor</option>';
+            supervisors.forEach(s => {
+            options += `<option value="${s.id}">${s.name}</option>`;
+            });
+            $('#supervisorUser').html(options);
+        },
+        error: function() {
+            $('#supervisorUser').html('<option value="">Error loading supervisors</option>');
+            showAlert('Failed to load supervisors', 'danger');
+        }
+        });
+
+        // Load Interns
+        $.ajax({
+        url: "{{ route('assignments.interns') }}",
+        method: 'GET',
+        beforeSend: function() {
+            $('#internUser').html('<option value="">Loading interns...</option>');
+        },
+        success: function(interns) {
+            let options = '<option value="">Select intern</option>';
+            interns.forEach(i => {
+            options += `<option value="${i.id}">${i.name}</option>`;
+            });
+            $('#internUser').html(options);
+        },
+        error: function() {
+            $('#internUser').html('<option value="">Error loading interns</option>');
+            showAlert('Failed to load interns', 'danger');
+        }
+        });
+    }
+
+    // --- Function to load current supervisor and intern assignments into respective tables ---
+    function loadAssignments() {
+        const isSupervisorTab = $('.nav-link.active').attr('href') === '#supervisors-tab';
+        const loadingText = isSupervisorTab ? 
+        '<tr><td colspan="4" class="text-center">Loading supervisors...</td></tr>' :
+        '<tr><td colspan="4" class="text-center">Loading interns...</td></tr>';
+
+        if (isSupervisorTab) {
+        $('#supervisorsTableBody').html(loadingText);
+        } else {
+        $('#internsTableBody').html(loadingText);
+        }
+
+        $.ajax({
+        url: "{{ route('assignments.assignments') }}",
+        method: 'GET',
+        success: function(assignments) {
+            $('#supervisorsTableBody, #internsTableBody').empty();
+            let supCount = 1, internCount = 1;
+
+            assignments.forEach(project => {
+            // Supervisors
+            project.supervisors.forEach(supervisor => {
+                $('#supervisorsTableBody').append(`
+                <tr data-project-id="${project.id}" data-user-id="${supervisor.id}">
+                    <td>${supCount++}</td>
+                    <td>${project.project_name}</td>
+                    <td>${supervisor.name}</td>
+                    <td>
+                    <button class="btn btn-sm btn-danger remove-assignment" 
+                        data-project-id="${project.id}"
+                        data-user-id="${supervisor.id}"
+                        data-role="supervisor">
+                        Remove
+                    </button>
+                    </td>
+                </tr>
+                `);
+            });
+
+            // Interns
+            project.interns.forEach(intern => {
+                $('#internsTableBody').append(`
+                <tr data-project-id="${project.id}" data-user-id="${intern.id}">
+                    <td>${internCount++}</td>
+                    <td>${project.project_name}</td>
+                    <td>${intern.name}</td>
+                    <td>
+                    <button class="btn btn-sm btn-danger remove-assignment" 
+                        data-project-id="${project.id}"
+                        data-user-id="${intern.id}"
+                        data-role="intern">
+                        Remove
+                    </button>
+                    </td>
+                </tr>
+                `);
+            });
+            });
+
+            // Empty States
+            if ($('#supervisorsTableBody').is(':empty')) {
+            $('#supervisorsTableBody').html('<tr><td colspan="4" class="text-center text-muted">No supervisor assignments found</td></tr>');
+            }
+            if ($('#internsTableBody').is(':empty')) {
+            $('#internsTableBody').html('<tr><td colspan="4" class="text-center text-muted">No intern assignments found</td></tr>');
+            }
+        },
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'Failed to load assignments';
+            const errRow = `<tr><td colspan="4" class="text-center text-danger">${msg}</td></tr>`;
+            isSupervisorTab ? $('#supervisorsTableBody').html(errRow) : $('#internsTableBody').html(errRow);
+            showAlert(msg, 'danger');
+        }
+        });
+    }
+
+    // --- AJAX form submission for assigning supervisors and interns ---
+    $('#supervisorAssignmentForm, #internAssignmentForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status"></span> Processing...');
+
+        $.ajax({
+        url: "{{ route('assignments.store') }}",
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            if (response.success) {
+            form.trigger('reset');
+            loadAssignments();
+            showAlert(response.message, 'success');
+            } else {
+            showAlert(response.message || 'Error creating assignment', 'danger');
+            }
+        },
+        error: function(xhr) {
+            const errors = xhr.responseJSON?.errors;
+            if (errors) {
+            Object.values(errors).forEach(e => showAlert(e[0], 'danger'));
+            } else {
+            showAlert(xhr.responseJSON?.message || 'Error processing request', 'danger');
+            }
+        },
+        complete: function() {
+            btn.prop('disabled', false).html(originalText);
+        }
+        });
     });
 
-    $('#cancelEditBtn').click(function() {
-      resetForm();
+    // --- Remove assignment via AJAX on button click ---
+    $(document).on('click', '.remove-assignment', function() {
+        const btn = $(this);
+        const projectId = btn.data('project-id');
+        const userId = btn.data('user-id');
+        const role = btn.data('role');
+
+        if (!confirm(`Are you sure you want to remove this ${role} assignment?`)) return;
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status"></span>');
+
+        $.ajax({
+        url: `{{ route('assignments.destroy', '') }}/${projectId}`,
+        method: 'DELETE',
+        data: {
+            user_id: userId,
+            role: role
+        },
+        success: function(response) {
+            if (response.success) {
+            loadAssignments();
+            showAlert(response.message, 'success');
+            } else {
+            showAlert(response.message || 'Error removing assignment', 'danger');
+            btn.prop('disabled', false).html('Remove');
+            }
+        },
+        error: function(xhr) {
+            showAlert(xhr.responseJSON?.message || 'Error processing request', 'danger');
+            btn.prop('disabled', false).html('Remove');
+        }
+        });
+    });
     });
 
-  });
 </script>
+
+
+<style>
+  .nav-tabs .nav-link {
+      font-weight: 500;
+  }
+  .table th {
+      white-space: nowrap;
+  }
+  .remove-assignment {
+      min-width: 80px;
+  }
+  .table-responsive {
+      overflow-x: auto;
+  }
+</style>

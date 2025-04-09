@@ -17,4 +17,34 @@ class Project extends Model
         'start_date',
         'end_date'
     ];
+
+    /**
+     * Get all supervisors assigned to this project
+     */
+    public function supervisors()
+    {
+        return $this->belongsToMany(User::class, 'project_user')
+                   ->wherePivot('role', 'supervisor')
+                   ->withTimestamps();
+    }
+
+    /**
+     * Get all interns assigned to this project
+     */
+    public function interns()
+    {
+        return $this->belongsToMany(User::class, 'project_user')
+                   ->wherePivot('role', 'intern')
+                   ->withTimestamps();
+    }
+
+    /**
+     * Get all users assigned to this project (both supervisors and interns)
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'project_user')
+                   ->withPivot('role')
+                   ->withTimestamps();
+    }
 }

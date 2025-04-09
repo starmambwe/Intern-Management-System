@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectAssignmentController;
 use App\Http\Controllers\RouteController; // Import RouteController
 
 
@@ -54,3 +55,23 @@ Route::post('/projects_archive/{id}', [ProjectController::class, 'archive'])->na
 Route::post('/projects/restore/{id}', [ProjectController::class, 'restore'])->name('projects.restore');
 Route::get('/projects_archive/{id}', [ProjectController::class, 'showArchived'])->name('projects.archive.show');
 Route::post('projects/archive/{id}', [ProjectController::class, 'archive']);
+
+
+// Project Assignment Routes
+Route::prefix('assignments')->group(function () {
+    // Data endpoints
+    Route::get('/projects', [ProjectAssignmentController::class, 'getProjects'])
+         ->name('assignments.projects');
+    Route::get('/supervisors', [ProjectAssignmentController::class, 'getSupervisors'])
+         ->name('assignments.supervisors');
+    Route::get('/interns', [ProjectAssignmentController::class, 'getInterns'])
+         ->name('assignments.interns');
+    Route::get('/assignments', [ProjectAssignmentController::class, 'getAssignments'])
+         ->name('assignments.assignments');
+    
+    // CRUD operations
+    Route::post('/', [ProjectAssignmentController::class, 'store'])
+         ->name('assignments.store');
+    Route::delete('/{projectId}', [ProjectAssignmentController::class, 'destroy'])
+         ->name('assignments.destroy');
+});

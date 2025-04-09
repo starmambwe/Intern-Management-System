@@ -51,4 +51,41 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'user_role')
             ->withTimestamps(); // If you want to track when roles were assigned
     }
+
+
+    /**
+     * Get all projects where this user is a supervisor
+     */
+    public function supervisedProjects()
+    {
+        return $this->belongsToMany(Project::class, 'project_user')
+                   ->wherePivot('role', 'supervisor')
+                   ->withTimestamps();
+    }
+
+    /**
+     * Get all projects where this user is an intern
+     */
+    public function internProjects()
+    {
+        return $this->belongsToMany(Project::class, 'project_user')
+                   ->wherePivot('role', 'intern')
+                   ->withTimestamps();
+    }
+
+    /**
+     * Check if user has supervisor role
+     */
+    public function isSupervisor()
+    {
+        return $this->roles()->where('name', 'supervisor')->exists();
+    }
+
+    /**
+     * Check if user has intern role
+     */
+    public function isIntern()
+    {
+        return $this->roles()->where('name', 'intern')->exists();
+    }
 }

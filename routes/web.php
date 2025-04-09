@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RouteController; // Import RouteController
@@ -41,3 +42,15 @@ Route::get('/users/{user}/roles', [UserController::class, 'getRoles'])
 // Update user's roles
 Route::put('/users/{user}/roles', [UserController::class, 'updateRoles'])
     ->name('users.roles.update');
+
+
+// Projects routes
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');  
+Route::get('/projects/{id}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects_archive', [ProjectController::class, 'archived'])->name('projects.archived');
+Route::post('/projects_archive/{id}', [ProjectController::class, 'archive'])->name('projects.archive');
+Route::post('/projects/restore/{id}', [ProjectController::class, 'restore'])->name('projects.restore');
+Route::get('/projects_archive/{id}', [ProjectController::class, 'showArchived'])->name('projects.archive.show');
+Route::post('projects/archive/{id}', [ProjectController::class, 'archive']);

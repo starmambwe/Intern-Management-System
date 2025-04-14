@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,12 @@ class RouteController extends Controller
                 $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
                 $page = 'admin.assignSupervisors';
                 return view($page, compact('users', 'roles', 'currentUser'));
+
+            case 'supervisor.createTasks':
+                $projects = Project::all();
+                $roles = Role::all();
+                $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
+                return view($page, compact('projects', 'roles', 'currentUser'));
                 
             default:
                 return view($page);

@@ -8,6 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectAssignmentController;
 use App\Http\Controllers\RouteController; // Import RouteController
+use App\Http\Controllers\TaskController;
+
 
 
 Route::get('/', function () {
@@ -74,4 +76,22 @@ Route::prefix('assignments')->group(function () {
          ->name('assignments.store');
     Route::delete('/{projectId}', [ProjectAssignmentController::class, 'destroy'])
          ->name('assignments.destroy');
+});
+
+// Task Routes
+Route::prefix('tasks')->group(function () {
+    // Route to store a new task
+    Route::post('/', [TaskController::class, 'store'])->name('tasks.store');
+    
+    // Route to archive a task
+    Route::post('/archive/{id}', [TaskController::class, 'archive'])->name('tasks.archive');
+    
+    // Route to restore an archived task
+    Route::post('/restore/{id}', [TaskController::class, 'restore'])->name('tasks.restore');
+    
+    // Route to get all archived tasks
+    Route::get('/archived', [TaskController::class, 'archived'])->name('tasks.archived');
+
+    // Route to get all tasks
+    Route::get('/', [TaskController::class, 'index'])->name('tasks.index');
 });

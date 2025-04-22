@@ -13,9 +13,18 @@ use Carbon\Carbon;
 class TaskController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::with('projects')->get();
+        $query = Task::with('projects');
+        
+        // Filter by project if project_id is provided
+        if ($request->has('project_id')) {
+            $query->whereHas('projects', function($q) use ($request) {
+                $q->where('projects.id', $request->project_id);
+            });
+        }
+        
+        $tasks = $query->get();
         return response()->json($tasks);
     }
 

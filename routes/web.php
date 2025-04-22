@@ -70,6 +70,8 @@ Route::prefix('assignments')->group(function () {
          ->name('assignments.interns');
     Route::get('/assignments', [ProjectAssignmentController::class, 'getAssignments'])
          ->name('assignments.assignments');
+    Route::get('/intern-tasks', [ProjectAssignmentController::class, 'getInternTasks'])
+         ->name('assignments.intern-tasks');     
     
     // CRUD operations
     Route::post('/', [ProjectAssignmentController::class, 'store'])

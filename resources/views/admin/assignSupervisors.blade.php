@@ -1,3 +1,133 @@
+@if(isset($viewType) && $viewType === 'Intern')
+    <div class="d-flex justify-content-center align-items-start" style="min-height: 60vh;">
+        <div style="width:100%; max-width: 500px;">
+            <h3 class="text-center">Your Assigned Projects & Tasks</h3>
+            @php
+                $projectOptions = collect($internProjects)->map(function($item) { return $item['project']; });
+            @endphp
+            <div class="mb-3" style="max-width: 400px; margin-left:auto; margin-right:auto;">
+                <label for="projectSelect" class="form-label">Select Project:</label>
+                <select id="projectSelect" class="form-select custom-dropdown">
+                    <option value="" selected disabled>-- Choose Project --</option>
+                    @foreach($projectOptions as $project)
+                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3" style="max-width: 400px; margin-left:auto; margin-right:auto;">
+                <label for="taskSelect" class="form-label">Select Task:</label>
+                <select id="taskSelect" class="form-select custom-dropdown" disabled>
+                    <option value="" selected disabled>-- Choose Task --</option>
+                </select>
+            </div>
+            <div id="detailsArea"></div>
+        </div>
+    </div>
+    <style>
+        .custom-dropdown {
+            min-width: 200px;
+            max-width: 100%;
+            width: 100%;
+            border-radius: 0.5rem;
+            border-color: #b5c2d6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            font-size: 1rem;
+            padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+            background-color: #f8fafc;
+            transition: border-color 0.2s;
+        }
+        .custom-dropdown:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 2px #c7d7fa;
+        }
+        #detailsArea .card {
+            max-width: 600px;
+            margin-top: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e0e7ef;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        }
+        #detailsArea .card-header {
+            background: linear-gradient(90deg, #e0e7ff 0%, #f8fafc 100%);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e0e7ef;
+        }
+        #detailsArea .card-body {
+            background: #fafdff;
+            color: #334155;
+        }
+    </style>
+    <script>
+        function initInternProjectTaskDropdowns() {
+            const internProjects = window.internProjectsData || @json($internProjects);
+            const projectSelect = document.getElementById('projectSelect');
+            const taskSelect = document.getElementById('taskSelect');
+            const detailsArea = document.getElementById('detailsArea');
+            if (!projectSelect || !taskSelect) return;
+
+            projectSelect.onchange = function() {
+                const projectId = this.value;
+                taskSelect.innerHTML = '<option value="" selected disabled>-- Choose Task --</option>';
+                detailsArea.innerHTML = '';
+                if (!internProjects[projectId]) {
+                    taskSelect.disabled = true;
+                    return;
+                }
+                const tasks = internProjects[projectId]['tasks'];
+                if (tasks.length === 0) {
+                    taskSelect.disabled = true;
+                    detailsArea.innerHTML = '<div class="alert alert-info">No tasks assigned for this project.</div>';
+                    showProjectDetails(projectId, null);
+                    return;
+                }
+                tasks.forEach(task => {
+                    const opt = document.createElement('option');
+                    opt.value = task.id;
+                    opt.textContent = task.name; 
+                    taskSelect.appendChild(opt);
+                });
+                taskSelect.disabled = false;
+            };
+
+            taskSelect.onchange = function() {
+                const projectId = projectSelect.value;
+                const taskId = this.value;
+                showProjectDetails(projectId, taskId);
+            };
+
+            function showProjectDetails(projectId, taskId) {
+                const data = internProjects[projectId];
+                let html = `<div class='card mb-3'><div class='card-header'><strong>Project:</strong> ${data.project.name}</div><div class='card-body'>`;
+                html += `<p><strong>Description:</strong> ${data.project.description}</p>`;
+                html += `<p><strong>Supervisors:</strong> `;
+                if (data.supervisors.length) {
+                    html += data.supervisors.map(s => s.name).join(', ');
+                } else {
+                    html += '<em>None assigned</em>';
+                }
+                html += `</p>`;
+                if (taskId) {
+                    const task = data.tasks.find(t => t.id == taskId);
+                    if (task) {
+                        html += `<hr><h5>Task Details:</h5><strong>${task.name}</strong><br><small>${task.description}</small>`;
+                    }
+                }
+                html += `</div></div>`;
+                detailsArea.innerHTML = html;
+            }
+        }
+
+        // Try to initialize immediately (for first page load)
+        initInternProjectTaskDropdowns();
+        // For AJAX: expose for re-init
+        window.initInternProjectTaskDropdowns = initInternProjectTaskDropdowns;
+        // If your AJAX loader supports a callback, call window.initInternProjectTaskDropdowns() after HTML is injected.
+    </script>
+@else
+<div id="assignSupervisorsMarker" style="display:none"></div>
 <div class="container mt-5">
     <!-- Main heading for the assignments section -->
     <h2>Project Assignments</h2>
@@ -138,19 +268,37 @@ $(document).ready(function () {
         }
     });
 
-    // Initialize the active tab based on URL hash or user role
-    let currentTab = window.location.hash || '{{ $isSupervisor ? "#interns-tab" : "#supervisors-tab" }}';
-    $(`a[href="${currentTab}"]`).tab('show');
+    // --- WRAP TAB INITIALIZATION IN FUNCTION ---
+    window.initAssignSupervisorsTabs = function(retryCount = 0) {
+        let currentTab = window.location.hash || '{{ $isSupervisor ? "#interns-tab" : "#supervisors-tab" }}';
+        let $tab = $(`a[href="${currentTab}"]`);
+        if ($tab.length === 0) {
+            if (retryCount < 5) {
+                setTimeout(function() {
+                    window.initAssignSupervisorsTabs(retryCount + 1);
+                }, 100); // Retry after 100ms
+            }
+            return;
+        }
+        // Bootstrap 5 tab activation
+        var tabEl = $tab[0];
+        var tab = new bootstrap.Tab(tabEl);
+        tab.show();
 
-    // Load initial data
-    loadDropdowns();
-    loadAssignments();
-
-    // Handle tab changes
-    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        window.location.hash = e.target.hash;
+        // Load initial data
+        loadDropdowns();
         loadAssignments();
-    });
+
+        // Handle tab changes
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            window.location.hash = e.target.hash;
+            loadAssignments();
+        });
+    };
+    // --- CALL INIT ON FIRST LOAD ---
+    if ($('#assignmentTabs').length) {
+        window.initAssignSupervisorsTabs();
+    }
 
     // When project selection changes in intern tab - UPDATED SECTION
     $('#internProject').on('change', function() {
@@ -160,8 +308,7 @@ $(document).ready(function () {
         
         // Reset task display
         taskContainer.hide();
-        checkboxesArea.html('<div class="text-center py-2"><div class="spinner-border spinner-border-sm" role="status"></div> Loading tasks...</div>');
-        
+        checkboxesArea.empty().append('<div class="alert alert-info">No tasks available for selected project</div>');
         if (!projectId) return;
 
         // Fetch tasks ONLY for the selected project with project relationship
@@ -172,13 +319,13 @@ $(document).ready(function () {
                 project_id: projectId,
                 with_projects: true // Ensure we get project relationships
             },
-            success: function(tasks) {
-                if (tasks.length > 0) {
+            success: function(res) {
+                if (res.length > 0) {
                     let checkboxes = '';
                     let hasTasksForProject = false;
                     
                     // Create checkbox only for tasks belonging to this project
-                    tasks.forEach(task => {
+                    res.forEach(task => {
                         // Verify task belongs to selected project
                         if (task.projects && task.projects.some(p => p.id == projectId)) {
                             checkboxes += `
@@ -257,9 +404,9 @@ $(document).ready(function () {
     // Load current assignments from server
     function loadAssignments() {
         const isSupervisorTab = $('.nav-link.active').attr('href') === '#supervisors-tab';
-        const loading = isSupervisorTab ?
-            '<tr><td colspan="4" class="text-center">Loading supervisors...</td></tr>' :
-            '<tr><td colspan="5" class="text-center">Loading interns...</td></tr>';
+        const loading = isSupervisorTab 
+            ? '<tr><td colspan="4" class="text-center">Loading supervisors...</td></tr>'
+            : '<tr><td colspan="5" class="text-center">Loading interns...</td></tr>';
 
         // Show loading state
         if (isSupervisorTab) $('#supervisorsTableBody').html(loading);
@@ -473,3 +620,4 @@ $(document).ready(function () {
         align-items: center;
     }
 </style>
+@endif

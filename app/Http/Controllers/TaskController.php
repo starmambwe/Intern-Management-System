@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Project;
 use App\Models\ProjectTaskArchive;
+use App\Models\TaskLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -99,6 +100,44 @@ class TaskController extends Controller
             ->get();
 
         return response()->json($archivedTasks);
+    }
+
+    /**
+     * Store a new log for a task (intern, supervisor, or admin)
+     */
+    public function storeLog(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'project_id' => 'required|exists:projects,id',
+            'log_text' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        // Optionally: check if user is allowed to log for this task/project
+
+        $log = TaskLog::create([
+            'user_id' => $user->id,
+            'task_id' => $request->task_id,
+            'project_id' => $request->project_id,
+            'log_text' => $request->log_text,
+        ]);
+
+        return response()->json(['message' => 'Log submitted', 'log' => $log->load('user')], 201);
+    }
+
+    /**
+     * Get all logs for a given task (optionally filtered by project)
+     */
+    public function getLogs(Request $request, $task_id)
+    {
+        $query = TaskLog::with(['user'])
+            ->where('task_id', $task_id);
+        if ($request->has('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+        $logs = $query->orderBy('created_at', 'asc')->get();
+        return response()->json($logs);
     }
 
 }

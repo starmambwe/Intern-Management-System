@@ -97,3 +97,9 @@ Route::prefix('tasks')->group(function () {
     // Route to get all tasks
     Route::get('/', [TaskController::class, 'index'])->name('tasks.index');
 });
+
+// Task log routes for AJAX
+Route::middleware(['auth'])->group(function () {
+    Route::post('/intern/task-log', [\App\Http\Controllers\TaskController::class, 'storeLog'])->name('task.log.store');
+    Route::get('/intern/task-logs/{task_id}', [\App\Http\Controllers\TaskController::class, 'getLogs'])->name('task.log.get');
+});

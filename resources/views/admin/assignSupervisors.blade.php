@@ -21,6 +21,7 @@
                 </select>
             </div>
             <div id="detailsArea"></div>
+            <div id="logArea" style="margin-top: 2rem;"></div>
         </div>
     </div>
     <style>
@@ -59,6 +60,35 @@
             background: #fafdff;
             color: #334155;
         }
+        #logArea {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .log-card {
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .log-header {
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 500;
+            font-size: 0.98rem;
+        }
+        .log-body {
+            padding: 0.75rem 1rem;
+            font-size: 0.97rem;
+            color: #374151;
+        }
+        .log-role-intern { color: #2563eb; }
+        .log-role-supervisor { color: #059669; }
+        .log-role-admin { color: #d97706; }
+        .log-self { font-weight: bold; }
+        .log-timestamp { font-size: 0.9em; color: #64748b; }
     </style>
     <script>
         function initInternProjectTaskDropdowns() {
@@ -66,12 +96,14 @@
             const projectSelect = document.getElementById('projectSelect');
             const taskSelect = document.getElementById('taskSelect');
             const detailsArea = document.getElementById('detailsArea');
+            const logArea = document.getElementById('logArea');
             if (!projectSelect || !taskSelect) return;
 
             projectSelect.onchange = function() {
                 const projectId = this.value;
                 taskSelect.innerHTML = '<option value="" selected disabled>-- Choose Task --</option>';
                 detailsArea.innerHTML = '';
+                logArea.innerHTML = '';
                 if (!internProjects[projectId]) {
                     taskSelect.disabled = true;
                     return;
@@ -96,6 +128,7 @@
                 const projectId = projectSelect.value;
                 const taskId = this.value;
                 showProjectDetails(projectId, taskId);
+                showLogFormAndLogs(projectId, taskId);
             };
 
             function showProjectDetails(projectId, taskId) {
@@ -118,8 +151,97 @@
                 html += `</div></div>`;
                 detailsArea.innerHTML = html;
             }
+
+            function showLogFormAndLogs(projectId, taskId) {
+                if (!projectId || !taskId) { logArea.innerHTML = ''; return; }
+                // Log form
+                let formHtml = `<form id='logSubmitForm' class='mb-4'>
+                    <div class='mb-2'><label for='log_text' class='form-label'>Submit Log for this Task:</label>
+                    <textarea class='form-control' id='log_text' name='log_text' rows='3' required placeholder='Describe your work, progress, or notes...'></textarea></div>
+                    <button type='submit' class='btn btn-primary'>Submit Log</button>
+                    <div id='logFormMsg' class='mt-2'></div>
+                </form>`;
+                formHtml += `<div id='logsList'></div>`;
+                logArea.innerHTML = formHtml;
+                // Fetch and show logs
+                fetchLogs(projectId, taskId);
+                // Attach submit handler
+                document.getElementById('logSubmitForm').onsubmit = function(e) {
+                    e.preventDefault();
+                    submitLog(projectId, taskId);
+                };
+            }
+
+            function fetchLogs(projectId, taskId) {
+                const logsList = document.getElementById('logsList');
+                logsList.innerHTML = '<div class="text-center text-secondary">Loading logs...</div>';
+                fetch(`/intern/task-logs/${taskId}?project_id=${projectId}`)
+                    .then(resp => resp.json())
+                    .then(logs => {
+                        if (!logs.length) {
+                            logsList.innerHTML = '<div class="alert alert-info">No logs for this task yet.</div>';
+                            return;
+                        }
+                        let html = '';
+                        logs.forEach(log => {
+                            const isSelf = log.user_id == window.currentUserId;
+                            let roleClass = 'log-role-intern';
+                            let roleLabel = 'Intern';
+                            if (log.user && log.user.roles && log.user.roles.length) {
+                                const r = log.user.roles[0].name.toLowerCase();
+                                if (r.includes('supervisor')) { roleClass = 'log-role-supervisor'; roleLabel = 'Supervisor'; }
+                                else if (r.includes('admin')) { roleClass = 'log-role-admin'; roleLabel = 'Admin'; }
+                            }
+                            html += `<div class='log-card'>
+                                <div class='log-header ${roleClass}${isSelf ? ' log-self' : ''}'>
+                                    <span>${log.user ? log.user.name : 'Unknown User'}</span>
+                                    <span class='log-timestamp float-end'>${(new Date(log.created_at)).toLocaleString()}</span><br>
+                                    <span class='badge ${roleClass}'>${roleLabel}${isSelf ? ' (You)' : ''}</span>
+                                </div>
+                                <div class='log-body'>${log.log_text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                            </div>`;
+                        });
+                        logsList.innerHTML = html;
+                    });
+            }
+
+            function submitLog(projectId, taskId) {
+                const logText = document.getElementById('log_text').value.trim();
+                const logFormMsg = document.getElementById('logFormMsg');
+                if (!logText) {
+                    logFormMsg.innerHTML = '<span class="text-danger">Log cannot be empty.</span>';
+                    return;
+                }
+                fetch('/intern/task-log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        task_id: taskId,
+                        project_id: projectId,
+                        log_text: logText
+                    })
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.log) {
+                        logFormMsg.innerHTML = '<span class="text-success">Log submitted!</span>';
+                        document.getElementById('log_text').value = '';
+                        fetchLogs(projectId, taskId);
+                    } else {
+                        logFormMsg.innerHTML = '<span class="text-danger">Failed to submit log.</span>';
+                    }
+                })
+                .catch(() => {
+                    logFormMsg.innerHTML = '<span class="text-danger">Error submitting log.</span>';
+                });
+            }
         }
 
+        // Expose current user ID for log highlighting
+        window.currentUserId = {{ $currentUser->id ?? 'null' }};
         // Try to initialize immediately (for first page load)
         initInternProjectTaskDropdowns();
         // For AJAX: expose for re-init

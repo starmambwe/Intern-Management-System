@@ -966,6 +966,14 @@
                 },
                 success: function(response) {
                     $('#' + elementId).html(response);
+                    // --- INIT ASSIGN SUPERVISORS TAB IF PRESENT (MARKER CHECK) ---
+                    if ($('#' + elementId + ' #assignSupervisorsMarker').length && typeof window.initAssignSupervisorsTabs === 'function') {
+                        try {
+                            window.initAssignSupervisorsTabs();
+                        } catch (e) {
+                            console.warn('initAssignSupervisorsTabs error:', e);
+                        }
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('Error loading page:', error);

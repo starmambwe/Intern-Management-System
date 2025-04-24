@@ -76,50 +76,35 @@
                     <div class="sidebar-content">
                         <ul class="nav nav-secondary">
                             @if (auth()->user())
-                            <!-- Dashboard Section Edits -->
-                            <!-- Admin Dashboard -->
-                            <li class="nav-item active">
-                                <a href="index.html">
+                            <li class="nav-item">
+                                <a onclick="loadPageIntoElement('admin.dashboard', 'mainContainer')">
                                     <i class="fas fa-home"></i>
                                     <p>Admin Dashboard</p>
                                 </a>
                             </li>
-
-                            <!-- Admin API Requests -->
                             <li class="nav-item">
-                                <a data-bs-toggle="collapse" href="#admin-api-requests">
-                                    <i class="fas fa-cogs"></i>
-                                    <p>Admin API Requests</p>
-                                    <span class="caret"></span>
+                                <a onclick="loadPageIntoElement('admin.manageUsers', 'mainContainer')">
+                                    <i class="fas fa-users-cog"></i>
+                                    <p>Manage Users & Roles</p>
                                 </a>
-                                <div class="collapse" id="admin-api-requests">
-                                    <ul class="nav nav-collapse">
-                                        <!-- Create Projects -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('admin.createProjects', 'mainContainer')">
-                                                <span class="sub-item">Create Projects</span>
-                                            </a>
-                                        </li>
-                                        <!-- Assign Supervisors -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('admin.assignSupervisors', 'mainContainer')">
-                                                <span class="sub-item">Assign Supervisors</span>
-                                            </a>
-                                        </li>
-                                        <!-- Manage Users -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('admin.manageUsers', 'mainContainer')">
-                                                <span class="sub-item">Manage Users</span>
-                                            </a>
-                                        </li>
-                                        <!-- View Reports -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('admin.viewReports', 'mainContainer')">
-                                                <span class="sub-item">View Reports</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a onclick="loadPageIntoElement('admin.manageProjects', 'mainContainer')">
+                                    <i class="fas fa-tasks"></i>
+                                    <p>Manage Projects</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a onclick="loadPageIntoElement('admin.projectAssignments', 'mainContainer')">
+                                    <i class="fas fa-user-tie"></i>
+                                    <p>Project Assignments</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a onclick="loadPageIntoElement('admin.viewReports', 'mainContainer')">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <p>View Reports</p>
+                                </a>
                             </li>
 
                             <!-- Supervisor API Requests -->
@@ -261,7 +246,6 @@
                                     </ul>
                                 </div>
                             </li>
-
 
                             <!-- Authentications -->
                             <li class="nav-item">

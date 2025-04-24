@@ -25,7 +25,7 @@ class RouteController extends Controller
                 return view($page, compact('users', 'roles'));
 
 
-            case 'admin.assignSupervisors':
+            case 'admin.projectAssignments':
                 $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
                 $roles = Role::all();
                 $roleNames = $currentUser ? $currentUser->roles->pluck('name')->toArray() : [];
@@ -74,13 +74,13 @@ class RouteController extends Controller
                     }
 
                     $viewType = 'Intern';
-                    return view('admin.assignSupervisors', compact('internProjects', 'currentUser', 'roles', 'viewType'));
+                    return view('admin.projectAssignments', compact('internProjects', 'currentUser', 'roles', 'viewType'));
                 } else {
                     $users = [];
                     $viewType = 'unknown';
                 }
 
-                return view('admin.assignSupervisors', compact('users', 'roles', 'currentUser', 'viewType'));
+                return view('admin.projectAssignments', compact('users', 'roles', 'currentUser', 'viewType'));
 
             case 'supervisor.assignedProjects':
                 $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
@@ -131,13 +131,13 @@ class RouteController extends Controller
                     }
 
                     $viewType = 'Intern';
-                    $page = 'admin.assignSupervisors';
+                    $page = 'admin.projectAssignments';
                     return view($page, compact('internProjects', 'currentUser', 'roles', 'viewType'));
                 } else {
                     $users = [];
                     $viewType = 'unknown';
                 }
-                $page = 'admin.assignSupervisors';
+                $page = 'admin.projectAssignments';
                 return view($page, compact('users', 'roles', 'currentUser', 'viewType'));
 
             case 'supervisor.createTasks':
@@ -146,6 +146,12 @@ class RouteController extends Controller
                 $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
                 return view($page, compact('projects', 'roles', 'currentUser'));
                 
+            case 'admin.manageProjects':
+                $projects = Project::all();
+                $roles = Role::all();
+                $currentUser = Auth::check() ? User::find(Auth::id())->load('roles') : null;
+                return view('admin.manageProjects', compact('projects', 'roles', 'currentUser'));
+
             default:
                 return view($page);
         }

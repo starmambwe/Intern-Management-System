@@ -323,7 +323,7 @@
                                     </form>
                                 </ul>
                             </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link dropdown-toggle"
                                     href="#"
@@ -405,8 +405,8 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            </li> --}}
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link dropdown-toggle"
                                     href="#"
@@ -479,8 +479,8 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            </li> --}}
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link"
                                     data-bs-toggle="dropdown"
@@ -552,8 +552,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-
+                            </li> --}}
                             <li class="nav-item topbar-user dropdown hidden-caret">
                                 <a
                                     class="dropdown-toggle profile-pic"
@@ -610,13 +609,13 @@
                                         </li>
                                         <li>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">My Profile</a>
+                                            {{-- <a class="dropdown-item" href="#">My Profile</a>
                                             <a class="dropdown-item" href="#">My Balance</a>
                                             <a class="dropdown-item" href="#">Inbox</a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#">Account Setting</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Logout</a>
+                                            <div class="dropdown-divider"></div> --}}
+                                            <a class="dropdown-item" href="#" id="logout-btn-dropdown">Logout</a>
                                         </li>
                                     </div>
                                 </ul>
@@ -897,7 +896,7 @@
         }
 
         $(document).ready(function() {
-            $('#logout-btn').click(function() {
+            $('#logout-btn, #logout-btn-dropdown').click(function() {
                 $.ajax({
                     url: "{{ route('auth.logout') }}", // Logout route
                     type: "POST",

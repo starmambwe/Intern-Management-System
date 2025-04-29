@@ -76,6 +76,7 @@
                     <div class="sidebar-content">
                         <ul class="nav nav-secondary">
                             @if (auth()->user())
+                            <!--
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#admin-dropdown">
                                     <i class="fas fa-user-shield"></i>
@@ -93,6 +94,7 @@
                                     </ul>
                                 </div>
                             </li>
+                            -->
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#projects-dropdown">
                                     <i class="fas fa-tasks"></i>
@@ -140,7 +142,7 @@
                                 </div>
                             </li>
 
-                            <!--
+                            {{-- 
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#supervisor-api-requests">
                                     <i class="fas fa-cogs"></i>
@@ -158,10 +160,10 @@
                                     </ul>
                                 </div>
                             </li>
-                            -->
+                            --}}
 
+                            {{-- 
                             <!-- Intern API Requests -->
-                            <!--
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#intern-api-requests">
                                     <i class="fas fa-cogs"></i>
@@ -179,8 +181,9 @@
                                     </ul>
                                 </div>
                             </li>
-                            -->
+                            --}}
 
+                            {{-- 
                             <!-- Authentications -->
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#authentications">
@@ -217,7 +220,8 @@
                                     </ul>
                                 </div>
                             </li>
-                            <!-- End of Dashboard Section Edits -->
+                            --}}
+                            {{-- End of Dashboard Section Edits --}}
 
 
                             <!-- Sidebar Components -->

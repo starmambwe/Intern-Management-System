@@ -76,53 +76,73 @@
                     <div class="sidebar-content">
                         <ul class="nav nav-secondary">
                             @if (auth()->user())
-                            <!-- Dashboard Section Edits -->
-                            <!-- Admin Dashboard -->
-                            <li class="nav-item active">
-                                <a href="index.html">
-                                    <i class="fas fa-home"></i>
-                                    <p>Admin Dashboard</p>
-                                </a>
-                            </li>
-
-                            <!-- Admin API Requests -->
+                            <!--
                             <li class="nav-item">
-                                <a data-bs-toggle="collapse" href="#admin-api-requests">
-                                    <i class="fas fa-cogs"></i>
-                                    <p>Admin API Requests</p>
+                                <a data-bs-toggle="collapse" href="#admin-dropdown">
+                                    <i class="fas fa-user-shield"></i>
+                                    <p>Admin</p>
                                     <span class="caret"></span>
                                 </a>
-                                <div class="collapse" id="admin-api-requests">
+                                <div class="collapse" id="admin-dropdown">
                                     <ul class="nav nav-collapse">
-                                        <!-- Create Projects -->
                                         <li>
-                                            <a onclick="loadPageIntoElement('admin.createProjects', 'mainContainer')">
-                                                <span class="sub-item">Create Projects</span>
+                                            <a onclick="loadPageIntoElement('admin.dashboard', 'mainContainer')">
+                                                <i class="fas fa-home"></i>
+                                                <span class="sub-item">Dashboard</span>
                                             </a>
                                         </li>
-                                        <!-- Assign Supervisors -->
+                                    </ul>
+                                </div>
+                            </li>
+                            -->
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#projects-dropdown">
+                                    <i class="fas fa-tasks"></i>
+                                    <p>Projects</p>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="projects-dropdown">
+                                    <ul class="nav nav-collapse">
                                         <li>
-                                            <a onclick="loadPageIntoElement('admin.assignSupervisors', 'mainContainer')">
-                                                <span class="sub-item">Assign Supervisors</span>
+                                            <a onclick="loadPageIntoElement('admin.manageProjects', 'mainContainer')">
+                                                <i class="fas fa-folder-open"></i>
+                                                <span class="sub-item">Manage Projects</span>
                                             </a>
                                         </li>
-                                        <!-- Manage Users -->
+                                        <li>
+                                            <a onclick="loadPageIntoElement('supervisor.createTasks', 'mainContainer')">
+                                                <i class="fas fa-tasks"></i>
+                                                <span class="sub-item">Create Tasks Under Projects</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a onclick="loadPageIntoElement('admin.projectAssignments', 'mainContainer')">
+                                                <i class="fas fa-user-tie"></i>
+                                                <span class="sub-item">Projects & Tasks Assignment</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#users-dropdown">
+                                    <i class="fas fa-users"></i>
+                                    <p>Users</p>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="users-dropdown">
+                                    <ul class="nav nav-collapse">
                                         <li>
                                             <a onclick="loadPageIntoElement('admin.manageUsers', 'mainContainer')">
-                                                <span class="sub-item">Manage Users</span>
-                                            </a>
-                                        </li>
-                                        <!-- View Reports -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('admin.viewReports', 'mainContainer')">
-                                                <span class="sub-item">View Reports</span>
+                                                <i class="fas fa-user-cog"></i>
+                                                <span class="sub-item">Manage Users & Roles</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
 
-                            <!-- Supervisor API Requests -->
+                            {{-- 
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#supervisor-api-requests">
                                     <i class="fas fa-cogs"></i>
@@ -131,76 +151,18 @@
                                 </a>
                                 <div class="collapse" id="supervisor-api-requests">
                                     <ul class="nav nav-collapse">
-                                        <!-- Manage Assigned Projects -->
                                         <li>
                                             <a onclick="loadPageIntoElement('supervisor.assignedProjects', 'mainContainer')">
+                                                <i class="fas fa-clipboard-list"></i>
                                                 <span class="sub-item">Manage Assigned Projects</span>
-                                            </a>
-                                        </li>
-                                        <!-- Create Tasks Under Projects -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.createTasks', 'mainContainer')">
-                                                <span class="sub-item">Create Tasks Under Projects</span>
-                                            </a>
-                                        </li>
-                                        <!-- Assign Tasks to Interns -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.assignTasks', 'mainContainer')">
-                                                <span class="sub-item">Assign Tasks to Interns</span>
-                                            </a>
-                                        </li>
-                                        <!-- Track Intern Progress -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.internProgress', 'mainContainer')">
-                                                <span class="sub-item">Track Intern Progress</span>
-                                            </a>
-                                        </li>
-                                        <!-- Approve/Reject Intern Reports -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.approveRejectReports', 'mainContainer')">
-                                                <span class="sub-item">Approve/Reject Intern Reports</span>
-                                            </a>
-                                        </li>
-                                        <!-- Submit Feedback for Tasks/Projects -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.feedback', 'mainContainer')">
-                                                <span class="sub-item">Submit Feedback for Tasks/Projects</span>
-                                            </a>
-                                        </li>
-                                        <!-- View Attendance of Interns -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.attendance', 'mainContainer')">
-                                                <span class="sub-item">View Attendance of Interns</span>
-                                            </a>
-                                        </li>
-                                        <!-- Monitor Project Progress -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.projectProgress', 'mainContainer')">
-                                                <span class="sub-item">Monitor Project Progress</span>
-                                            </a>
-                                        </li>
-                                        <!-- Receive Notifications (Task Submissions, Deadlines) -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.notifications', 'mainContainer')">
-                                                <span class="sub-item">Receive Notifications</span>
-                                            </a>
-                                        </li>
-                                        <!-- Review Time Tracked on Tasks -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.timeTrack', 'mainContainer')">
-                                                <span class="sub-item">Review Time Tracked on Tasks</span>
-                                            </a>
-                                        </li>
-                                        <!-- Participate in Comment Threads for Tasks -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('supervisor.comments', 'mainContainer')">
-                                                <span class="sub-item">Participate in Comment Threads</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
+                            --}}
 
+                            {{-- 
                             <!-- Intern API Requests -->
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#intern-api-requests">
@@ -210,59 +172,18 @@
                                 </a>
                                 <div class="collapse" id="intern-api-requests">
                                     <ul class="nav nav-collapse">
-                                        <!-- View Assigned Projects and Tasks -->
                                         <li>
                                             <a onclick="loadPageIntoElement('intern.projectsAndTasks', 'mainContainer')">
+                                                <i class="fas fa-project-diagram"></i>
                                                 <span class="sub-item">Projects and Tasks</span>
-                                            </a>
-                                        </li>
-                                        <!-- Work on Tasks and Submit Reports -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.reports', 'mainContainer')">
-                                                <span class="sub-item">Task(s) Report(s) Submission</span>
-                                            </a>
-                                        </li>
-                                        <!-- Mark Daily Attendance -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.attendance', 'mainContainer')">
-                                                <span class="sub-item">Mark Daily Attendance</span>
-                                            </a>
-                                        </li>
-                                        <!-- Request Help Within a Project -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.help', 'mainContainer')">
-                                                <span class="sub-item">Request Help Within a Project</span>
-                                            </a>
-                                        </li>
-                                        <!-- Track Personal Progress on Tasks and Projects -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.progress', 'mainContainer')">
-                                                <span class="sub-item">Personal Progress</span>
-                                            </a>
-                                        </li>
-                                        <!-- Receive Notifications (New Tasks, Feedback, Deadlines) -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.notifications', 'mainContainer')">
-                                                <span class="sub-item">Notifications</span>
-                                            </a>
-                                        </li>
-                                        <!-- Log Time Spent on Tasks -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.timeLogs', 'mainContainer')">
-                                                <span class="sub-item">Time Spent on Tasks</span>
-                                            </a>
-                                        </li>
-                                        <!-- Participate in Comment Threads for Tasks -->
-                                        <li>
-                                            <a onclick="loadPageIntoElement('intern.comments', 'mainContainer')">
-                                                <span class="sub-item">Participate in Comment Threads</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
+                            --}}
 
-
+                            {{-- 
                             <!-- Authentications -->
                             <li class="nav-item">
                                 <a data-bs-toggle="collapse" href="#authentications">
@@ -299,7 +220,8 @@
                                     </ul>
                                 </div>
                             </li>
-                            <!-- End of Dashboard Section Edits -->
+                            --}}
+                            {{-- End of Dashboard Section Edits --}}
 
 
                             <!-- Sidebar Components -->
@@ -405,7 +327,7 @@
                                     </form>
                                 </ul>
                             </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link dropdown-toggle"
                                     href="#"
@@ -487,8 +409,8 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            </li> --}}
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link dropdown-toggle"
                                     href="#"
@@ -561,8 +483,8 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
+                            </li> --}}
+                            {{-- <li class="nav-item topbar-icon dropdown hidden-caret">
                                 <a
                                     class="nav-link"
                                     data-bs-toggle="dropdown"
@@ -634,8 +556,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-
+                            </li> --}}
                             <li class="nav-item topbar-user dropdown hidden-caret">
                                 <a
                                     class="dropdown-toggle profile-pic"
@@ -650,7 +571,13 @@
                                     </div>
                                     <span class="profile-username">
                                         <span class="op-7">Hi,</span>
-                                        <span class="fw-bold">Hizrian</span>
+                                        <span class="fw-bold">
+                                            @auth
+                                                {{ Auth::user()->name }}
+                                            @else
+                                                User
+                                            @endauth
+                                        </span>
                                     </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -664,8 +591,20 @@
                                                         class="avatar-img rounded" />
                                                 </div>
                                                 <div class="u-text">
-                                                    <h4>Hizrian</h4>
-                                                    <p class="text-muted">hello@example.com</p>
+                                                    <h4>
+                                                        @auth
+                                                            {{ Auth::user()->name }}
+                                                        @else
+                                                            User
+                                                        @endauth
+                                                    </h4>
+                                                    <p class="text-muted">
+                                                        @auth
+                                                            {{ Auth::user()->email }}
+                                                        @else
+                                                            user@example.com
+                                                        @endauth
+                                                    </p>
                                                     <a
                                                         href="profile.html"
                                                         class="btn btn-xs btn-secondary btn-sm">View Profile</a>
@@ -674,13 +613,13 @@
                                         </li>
                                         <li>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">My Profile</a>
+                                            {{-- <a class="dropdown-item" href="#">My Profile</a>
                                             <a class="dropdown-item" href="#">My Balance</a>
                                             <a class="dropdown-item" href="#">Inbox</a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#">Account Setting</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Logout</a>
+                                            <div class="dropdown-divider"></div> --}}
+                                            <a class="dropdown-item" href="#" id="logout-btn-dropdown">Logout</a>
                                         </li>
                                     </div>
                                 </ul>
@@ -698,29 +637,7 @@
 
             <footer class="footer">
                 <div class="container-fluid d-flex justify-content-between">
-                    <nav class="pull-left">
-                        <ul class="nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="http://www.themekita.com">
-                                    ThemeKita
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"> Help </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"> Licenses </a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <div class="copyright">
-                        2024, made with <i class="fa fa-heart heart text-danger"></i> by
-                        <a href="http://www.themekita.com">ThemeKita</a>
-                    </div>
-                    <div>
-                        Distributed by
-                        <a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
-                    </div>
+                    <span class="text-center w-100">&copy; The Copperbelt University 2025</span>
                 </div>
             </footer>
         </div>
@@ -983,7 +900,7 @@
         }
 
         $(document).ready(function() {
-            $('#logout-btn').click(function() {
+            $('#logout-btn, #logout-btn-dropdown').click(function() {
                 $.ajax({
                     url: "{{ route('auth.logout') }}", // Logout route
                     type: "POST",
